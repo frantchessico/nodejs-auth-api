@@ -1,11 +1,12 @@
 import nodemailer from 'nodemailer';
 
 
+const host_email = process.env.HOST!
 export const transport = nodemailer.createTransport({
-    host: 'premium291.web-hosting.com',
-    port: 465,
+    host: `${host_email}`,
+    port: process.env.EMAIL_PORT,
     auth: {
-        user: 'hi@franciscoinoque.tech',
-        pass: 'Luisa@0!'
+        user: `${process.env.USER}`,
+        pass: `${process.env.PASS}`
     }
 })
