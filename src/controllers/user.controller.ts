@@ -4,8 +4,6 @@ import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { IUser, UserModel } from '../models/User';
 import { getUser, createUser, updateUser, deleteUser, auth, requestPasswordReset, resetPassword, getUserByEmail, verifyEmail, EmailVerificationService } from '../services/user.service';
-import { deleteUserAndPosts } from '../services/post.service';
-import { PostModel } from '../models/Post';
 import { transport } from '../config/nodemailer';
 import {  generateToken, verifyToken } from '../utils/token';
 
@@ -16,23 +14,23 @@ interface Params extends Request {
   _id: Types.ObjectId;
 }
 
-export const profile = async (req: Request<Params>,res: Response): Promise<any> => {
+export const profileCtrl = async (req: Request,res: Response): Promise<any> => {
   const { _id } = req.user as IUser;
   try {
     const user = await getUser(UserModel, _id);
     if (!user) {
       return res.status(400).json({ message: 'No product found' });
     }
-    res.status(200).json(user);
+   return res.status(200).json(user);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error', error });
+  return  res.status(500).json({ message: 'Internal Server Error', error });
   }
 };
 
 //TODO: Create Store
 
-export const createAccount = async (req: Request, res: Response): Promise<any> => {
+export const createAccountCtrl = async (req: Request, res: Response): Promise<any> => {
   try {
     const { firstName, lastName, email, password } = z.object({
         firstName: z.string().nonempty().min(3),
@@ -65,15 +63,15 @@ export const createAccount = async (req: Request, res: Response): Promise<any> =
       <a href="http://localhost:2812/api/users/request/password-reset?query=${token}">Confirma sua conta</a>
       `
       })
-    res.status(201).json({message: 'Check your inbox, we have sent an account verification email.', token});
+   return res.status(201).json({message: 'Check your inbox, we have sent an account verification email.', token});
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+   return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-export const updateAccount = async (req: Request<Params>, res: Response): Promise<any> => {
-  const { _id } = req.params;
+export const updateAccountCtrl = async (req: Request, res: Response): Promise<any> => {
+  const { _id } = req.params as unknown as Types.ObjectId;
   try {
     const { firstName, lastName } = z.object({
         firstName: z.string().optional(),
@@ -90,32 +88,32 @@ export const updateAccount = async (req: Request<Params>, res: Response): Promis
     if (!user) {
       return res.status(400).json({ message: 'No user found' });
     }
-    res.status(200).json(user);
+   return res.status(200).json(user);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+  return  res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
 
-export const deleteAccount = async (req: Request<Params>,res: Response): Promise<any> => {
-  const { _id } = req.params;
+export const deleteAccountCtrl = async (req: Request,res: Response): Promise<any> => {
+  const { _id } = req.params as unknown as Types.ObjectId;
   try {
     const user = await deleteUser(UserModel, _id);
-    await deleteUserAndPosts(UserModel, PostModel, _id)
+    
     if (!user) {
       return res.status(400).json({ message: 'No product found' });
     }
-    res.status(200).json({ message: 'Product deleted successfully' });
+   return res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+   return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
 
 
-export const authenticationUser = async(req: Request, res: Response) => {
+export const authenticationUserCtrl = async(req: Request, res: Response) => {
     const { email, password } = req.body;
 
     try {
@@ -127,7 +125,7 @@ export const authenticationUser = async(req: Request, res: Response) => {
     }
 }
 
-export const resquestingPasswordReset = async(req: Request, res: Response) => {
+export const resquestingPasswordResetCtrl = async(req: Request, res: Response) => {
   const { email } = req.body as IUser;
 
   try {
@@ -151,7 +149,7 @@ export const resquestingPasswordReset = async(req: Request, res: Response) => {
   }
 }
 
-export const resetingPassword = async(req: Request, res: Response) => {
+export const resetPasswordCtrl = async(req: Request, res: Response) => {
   const { pass_token } = req.headers;
 
   const { newPassword } = req.body;
@@ -170,7 +168,7 @@ export const resetingPassword = async(req: Request, res: Response) => {
 }
 
 
-export const requestEmailVerification = async(req: Request, res: Response) => {
+export const requestEmailVerificationCtrl = async(req: Request, res: Response) => {
   const { email } = req.body
 
   try {
@@ -187,7 +185,7 @@ export const requestEmailVerification = async(req: Request, res: Response) => {
   }
 }
 
-export const emailVerification = async(req: Request, res: Response) => {
+export const emailVerificationCtrl = async(req: Request, res: Response) => {
   const { emailverifytoken } = req.headers;
  
   let token = emailverifytoken?.toString();

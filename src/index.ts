@@ -4,8 +4,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { dbConnection } from './config/database';
-import userRouter from './routes/user.routes';
-import { getSecret } from './utils/token';
+import router from './routes/routes';
+
 
 
 const app = express();
@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'));
-app.use('/api', userRouter);
+app.use('/api', router);
 
 dbConnection();
 const port = process.env.PORT || 2812;
